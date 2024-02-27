@@ -3,44 +3,43 @@ import Input from './Input';
 import { getFilteredPrice } from '../service/api';
 import { useAppDispatch } from '../store/hooks';
 import {
-  setBrand,
   setIsError,
   setIsLoading,
-  setPrice,
-  setProduct,
+  setRequestFilters,
   setStore,
 } from '../store/slice';
+import { DEFAULT_FILTERS } from '../utils/consts';
+import { FiltersType } from '../utils/types';
+import { setDisabled } from '../utils/setDisabled';
 
 function Filters() {
-  const [nameValue, setNameValue] = useState('');
-  const [brandValue, setBrandValue] = useState('');
-  const [priceValue, setPriceValue] = useState<number | null>(null);
+  const [filters, setFilters] = useState<FiltersType>(DEFAULT_FILTERS);
   const dispatch = useAppDispatch();
 
-  const handlerChangePrice = (e: ChangeEvent<HTMLInputElement>) => {
-    const price = Number(e.target.value);
-    if (price && price <= 0) {
-      setPriceValue(null);
+  const handlerChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const isKey = Object.keys(DEFAULT_FILTERS).includes(name);
+
+    if (name === 'price' && Number(value) < 0) {
       return;
     }
-    setPriceValue(price);
-    setNameValue('');
-    setBrandValue('');
+
+    if (isKey) {
+      const newValue = name === 'price' ? Number(value) : value;
+      setFilters(() => ({
+        product: '',
+        price: 0,
+        brand: '',
+        [name]: newValue,
+      }));
+    }
   };
 
-  const handleSetFilter = async (
-    price: number,
-    product: string,
-    brand: string
-  ) => {
-    dispatch(setPrice(price));
-    dispatch(setProduct(product));
-    dispatch(setBrand(brand));
+  const handleSetFilter = async (filters: FiltersType) => {
+    dispatch(setRequestFilters(filters));
     try {
       dispatch(setIsLoading(true));
-      const products = await getFilteredPrice(price, product, brand);
-      // const products = await getFields();
-      console.log('products: ', products);
+      const products = await getFilteredPrice(filters);
       dispatch(setStore(products));
       dispatch(setIsError(false));
     } catch (error) {
@@ -49,7 +48,7 @@ function Filters() {
         dispatch(setIsError(true));
         try {
           dispatch(setIsLoading(true));
-          const products = await getFilteredPrice(price, product, brand);
+          const products = await getFilteredPrice(filters);
           dispatch(setStore(products));
           dispatch(setIsError(false));
         } catch (error) {
@@ -66,42 +65,38 @@ function Filters() {
 
   return (
     <>
-      <div className="filters-container">
+      <form
+        className="filters-container"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSetFilter(filters);
+        }}
+      >
         <Input
-          label="Product"
+          label="product"
           inputType="text"
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            setNameValue(e.target.value);
-            setPriceValue(null);
-            setBrandValue('');
-          }}
-          value={nameValue}
+          onChange={handlerChange}
+          value={filters.product}
         />
         <Input
-          label="Price"
+          label="price"
           inputType="number"
-          onChange={handlerChangePrice}
-          value={priceValue ? priceValue : null}
+          onChange={handlerChange}
+          value={filters.price ? filters.price : null}
         />
         <Input
           label="brand"
           inputType="text"
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            setBrandValue(e.target.value);
-            setPriceValue(null);
-            setNameValue('');
-          }}
-          value={brandValue}
+          onChange={handlerChange}
+          value={filters.brand}
         />
         <button
-          disabled={!!!nameValue && !!!priceValue && !!!brandValue}
-          onClick={() =>
-            handleSetFilter(priceValue || 0, nameValue, brandValue)
-          }
+          disabled={setDisabled(DEFAULT_FILTERS, filters)}
+          onClick={() => handleSetFilter(filters)}
         >
           submit
         </button>
-      </div>
+      </form>
     </>
   );
 }

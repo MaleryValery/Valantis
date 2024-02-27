@@ -1,13 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from './store';
-import { Product } from '../utils/types';
+import { FiltersType, Product } from '../utils/types';
+import { DEFAULT_FILTERS } from '../utils/consts';
 
 interface StoreState {
   products: Product[];
   offset: number;
-  brand: string;
-  price: number | null;
-  product: string;
+  requestFilters: FiltersType;
   isLoading: boolean;
   isError: boolean;
 }
@@ -15,9 +14,7 @@ interface StoreState {
 const initialState: StoreState = {
   products: [],
   offset: 0,
-  brand: '',
-  price: null,
-  product: '',
+  requestFilters:  DEFAULT_FILTERS,
   isLoading: false,
   isError: false,
 };
@@ -32,14 +29,8 @@ export const storeSlice = createSlice({
     setOffset: (state, action: PayloadAction<number>) => {
       state.offset = action.payload;
     },
-    setBrand: (state, action: PayloadAction<string>) => {
-      state.brand = action.payload;
-    },
-    setProduct: (state, action: PayloadAction<string>) => {
-      state.product = action.payload;
-    },
-    setPrice: (state, action: PayloadAction<number>) => {
-      state.price = action.payload;
+    setRequestFilters: (state, action: PayloadAction<FiltersType>) => {
+      state.requestFilters = action.payload;
     },
     setIsLoading: (state, action: PayloadAction<boolean>) => {
       state.isLoading = action.payload;
@@ -53,9 +44,7 @@ export const storeSlice = createSlice({
 export const {
   setStore,
   setOffset,
-  setBrand,
-  setProduct,
-  setPrice,
+  setRequestFilters,
   setIsLoading,
   setIsError,
 } = storeSlice.actions;

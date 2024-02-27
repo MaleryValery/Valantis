@@ -4,3 +4,9 @@ export type Product = {
   price: number;
   product: string;
 };
+
+export type FiltersType = {
+  product: string;
+  price: number | null;
+  brand: string;
+};

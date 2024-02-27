@@ -7,15 +7,16 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { setIsError, setIsLoading, setStore } from '../store/slice';
 import Pagination from './Pagination';
 import Loader from './Loader';
+import { DEFAULT_FILTERS } from '../utils/consts';
+import { setDisabled } from '../utils/setDisabled';
 
 function App() {
   const dispatch = useAppDispatch();
-  const { offset, brand, product, price, isLoading, isError } = useAppSelector(
-    (state) => state.store
-  );
+  const { offset, isLoading, isError, requestFilters } = useAppSelector((state) => state.store);
 
+  console.log(Object.is(requestFilters, DEFAULT_FILTERS))
   useEffect(() => {
-    async function getItems() {
+    async function getItems(): Promise<void> {
       try {
         dispatch(setIsLoading(true));
         const productsId = await getProductsId(offset);
@@ -43,17 +44,15 @@ function App() {
         dispatch(setIsLoading(false));
       }
     }
-    if (!brand && !product && !price) {
-      getItems();
-    }
-  }, [offset, brand, product, price]);
+    getItems();
+  }, [offset]);
 
   return (
     <>
       {isLoading && <Loader />}
       <Filters />
       <ProductList />
-      {!!!brand && !!!product && !!!price && !isError && <Pagination />}
+      {setDisabled(requestFilters, DEFAULT_FILTERS) && !isError && <Pagination />}
     </>
   );
 }
