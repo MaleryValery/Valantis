@@ -9,5 +9,5 @@ export default defineConfig({
     open: true,
   },
   plugins: [react()],
-  base: '/valantis-vm/',
+  base: './',
 });

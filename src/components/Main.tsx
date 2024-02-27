@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import '../App.css';
 import Filters from './Filters';
 import { getProductsId, getProductsByIDs } from '../service/api';
 import ProductList from './ProductList';
@@ -14,7 +13,6 @@ function App() {
   const dispatch = useAppDispatch();
   const { offset, isLoading, isError, requestFilters } = useAppSelector((state) => state.store);
 
-  console.log(Object.is(requestFilters, DEFAULT_FILTERS))
   useEffect(() => {
     async function getItems(): Promise<void> {
       try {

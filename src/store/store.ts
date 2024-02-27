@@ -4,8 +4,6 @@ import storeReducer from './slice';
 export const store = configureStore({
   reducer: {
     store: storeReducer,
-    // comments: commentsReducer,
-    // users: usersReducer,
   },
 });
 
