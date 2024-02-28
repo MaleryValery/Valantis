@@ -5,7 +5,9 @@ import { DEFAULT_FILTERS } from '../utils/consts';
 
 interface StoreState {
   products: Product[];
+  productsPagination: Product[];
   offset: number;
+  customOffset: number;
   requestFilters: FiltersType;
   isLoading: boolean;
   isError: boolean;
@@ -13,6 +15,8 @@ interface StoreState {
 
 const initialState: StoreState = {
   products: [],
+  productsPagination: [],
+  customOffset: 0,
   offset: 0,
   requestFilters:  DEFAULT_FILTERS,
   isLoading: false,
@@ -38,6 +42,12 @@ export const storeSlice = createSlice({
     setIsError: (state, action: PayloadAction<boolean>) => {
       state.isError = action.payload;
     },
+    setProductsPagination: (state, action: PayloadAction<Product[]>) => {
+      state.productsPagination = action.payload;
+    },
+    setCustomOffset: (state, action: PayloadAction<number>) => {
+      state.customOffset = action.payload;
+    },
   },
 });
 
@@ -47,6 +57,8 @@ export const {
   setRequestFilters,
   setIsLoading,
   setIsError,
+  setProductsPagination,
+  setCustomOffset
 } = storeSlice.actions;
 
 export const selectCount = (state: RootState) => state.store.products;
